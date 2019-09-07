@@ -1,4 +1,10 @@
 const express = require('express')
+// Testing... TODO: remove later
+const config = require('./config/config')
+const mongo = require('./api/mongodbconnector')
+
+mongo.establishConnection(config.databaseSettings)
+
 const app = express()
 const port = 3000
 
