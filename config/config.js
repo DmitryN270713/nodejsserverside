@@ -10,18 +10,16 @@ const databaseSettings = {
         w: "majority",
         wtimeout: 10000,
         j: true,
-        readPreference: 'ReadPreference.NEAREST',
+        readPreference: 'nearest',
         native_parser: false
     }),
 
     serverParams: () => ({
         autoReconnect: true,
         poolSize: 7,
-        socketoptions: {
-            keepAlive: 300,
-            connectTimeoutMS: 30000,
-            socketTimeoutMS: 30000
-        }
+        keepAlive: 300,
+        connectTimeoutMS: 30000,
+        socketTimeoutMS: 30000
     }),
 
     replsetParams: (replicaSetName = 'weatherReplica') => ({
