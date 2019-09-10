@@ -29,7 +29,7 @@ const establishConnection = (options, eventEmmiter) => {
         dbClient.connect(
             getURL(options), 
             getSettingsObject(options),
-            (err, db) => {
+            (err, client) => {
                 if (err) {
                     console.error('Monkeys are not doing their job...')
                     eventEmmiter.emit('DB_ERROR', err)
@@ -37,7 +37,7 @@ const establishConnection = (options, eventEmmiter) => {
 
                 // TO DO: Authentication goes here...
                 // For now just emit DB_READY signal
-                eventEmmiter.emit('DB_READY', db)
+                eventEmmiter.emit('DB_READY', client.db(options.db))
             }
         )
     })
