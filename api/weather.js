@@ -27,8 +27,14 @@ const weatherApi = (app, weatherDB) => {
         }).catch(next)
     })
 
-    app.get('/addlocation/:name/:country', (req, res, next) => {
-        dbWorker.addLocation(req.params.name, req.params.country).then(newLocation => {
+    app.get('/alllocations/:toskip/:perreq', (req, res, next) => {
+        dbWorker.getAllLocations(req.params.toskip, req.params.perreq).then(locations => {
+            res.status(status.OK).json(locations)
+        }).catch(next)
+    })
+
+    app.post('/addlocation', (req, res, next) => {
+        dbWorker.addLocation(req.body.city, req.body.country).then(newLocation => {
             res.status(status.OK).json(newLocation)
         }).catch(next)
     })

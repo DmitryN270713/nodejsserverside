@@ -1,5 +1,6 @@
 const express = require('express')
 const {EventEmitter} = require('events')
+var bodyParser = require('body-parser')
 const config = require('./config/config')
 const mongoDBConnector = require('./database/mongodbconnector')
 const weatherDB = require('./database/weatherdb')
@@ -11,16 +12,19 @@ process.on('uncaughtException', (err) => {
     console.error('Unpredictable behavior', err)
 })
 
-process.on('uncaughtRejection', (err, promise) => {
-    console.error('Unhandled Rejection', err)
-})
-
 // TO DO: move to the server.js
 const app = express()
 app.use((err, req, res, next) => {
-  reject(new Error('Monkey is broken. Replace it...' + err))
-  res.status(500).send('Something went wrong!')
+    reject(new Error('Monkey is broken. Replace it...' + err))
+    res.status(500).send('Something went wrong!')
+    next()
 })
+
+// For parsing application/json
+app.use(bodyParser.json())
+// For parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }))
+
 const port = 3000
 
 eventEmmiter.on('DB_READY', (db) => {

@@ -3,9 +3,29 @@
 const sha1 = require('sha1')
 
 // DB worker
-const dbWorker = (db) => {
+const dbWorker = async (db) => {
 
     const collection = db.collection('weathercollection')
+    await collection.createIndex({ id: 1 }, { sparse: true, unique: true })
+
+    const getAllLocations = (toskip, perreq) => {
+        return new Promise((resolve, reject) => {
+            const projection = {_id: 0, weather: 0}
+            const locations = []
+            const addLocation = (location) => {
+                locations.push(location)
+            }
+            const sendLocation = (err) => {
+                if (err) {
+                    reject(new Error(`An error occured fetching all locations: ${err}`))
+                }
+                
+                resolve(locations.slice())
+            }
+            const cursor = collection.aggregate([{ $skip: parseInt(toskip) }, { $limit: parseInt(perreq)}, { $project: projection}])
+            cursor.forEach(addLocation, sendLocation)
+        })
+    }
 
     const getLocationsByCity = (name) => {
         return new Promise((resolve, reject) => {
@@ -55,23 +75,24 @@ const dbWorker = (db) => {
                 
                 resolve(location)
             }
-            console.log(collection.findOne({ name: name, country: country }, { projection: projection }, sendLocation))
+            collection.findOne({ name: name, country: country }, { projection: projection }, sendLocation)
         })
     }
 
     // Asumes that it is unique location
     // TO DO: fix it
     const addLocation = (name, country) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject, next) => {
             const sendInsertLocation = (err, newLocation) => {
                 if (err) {
-                    reject(new Error('An error occured adding new location'))
+                    reject(new Error(`An error occured adding new location ${err}`))
                 }
                 
                 resolve(newLocation)
             }
-            //TO DO: hash generation from city and country
-            collection.insertOne({id: sha1(name), name: name, country: country, weather: [{date: new Date(), pressure: 0, temperature: 0, humidity: 0}]}, sendInsertLocation)
+            
+            collection.insertOne({ id: sha1(name + country), name: name, country: country, 
+                                   weather: [{date: new Date(), pressure: 0, temperature: 0, humidity: 0}] }, sendInsertLocation)
         })
     }
 
@@ -84,6 +105,7 @@ const dbWorker = (db) => {
         getLocationByCountryCity,
         getLocationsByCountry,
         getLocationsByCity,
+        getAllLocations,
         addLocation,
         disconnect
     })
