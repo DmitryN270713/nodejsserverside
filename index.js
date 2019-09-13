@@ -1,10 +1,12 @@
 const express = require('express')
 const {EventEmitter} = require('events')
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 const config = require('./config/config')
 const mongoDBConnector = require('./database/mongodbconnector')
 const weatherDB = require('./database/weatherdb')
 const api = require('./api/weather')
+const errorHandler = require('./api/errorhandler')
 
 const eventEmmiter = new EventEmitter()
 
@@ -14,16 +16,17 @@ process.on('uncaughtException', (err) => {
 
 // TO DO: move to the server.js
 const app = express()
-app.use((err, req, res, next) => {
-    reject(new Error('Monkey is broken. Replace it...' + err))
-    res.status(500).send('Something went wrong!')
-    next()
-})
 
-// For parsing application/json
+// Allow nested objects
+app.use(bodyParser.urlencoded({
+    extended: true
+}))
+
+// Parse Application/json
 app.use(bodyParser.json())
-// For parsing application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(methodOverride())
+app.use(errorHandler.errorHandler().logErrors)
+app.use(errorHandler.errorHandler().errorHandler)
 
 const port = 3000
 
