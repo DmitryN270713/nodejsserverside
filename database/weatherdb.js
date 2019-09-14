@@ -95,6 +95,40 @@ const dbWorker =  async (db) => {
         })
     }
 
+    const getWeatherDataFromDateId = (id, fromDate, toDate) => {
+        return new Promise((resolve, reject) => {
+            const projection = { _id: 0, id: 0 }
+            const weatherInfo = []
+            const addWeather = (weather) => {
+                console.log(weather)
+                weatherInfo.push(weather)
+            }
+            
+            const sendWeather = (err) => {
+                if (err) {
+                    return reject(new Error(`An error occured fetching weather for: ${id}, err: ${err}`))
+                }
+                
+                resolve(weatherInfo.slice())
+            }
+
+            // If toDate is undefined, then retrieve all data until the present
+            let cursor = null
+            console.log(fromDate + " " + toDate)
+            if (!toDate) {
+                cursor = collection.aggregate([{ $unwind: "$weather" }, { $match: { date: {$gte: new Date(fromDate)} } }, { $project: projection}])
+            } else {
+               /* cursor = collection.aggregate([ { $unwind: "$weather" }, 
+                                                      {$and: [{ date: {$gte: new Date(fromDate)} },
+                                                              { date: {$lte: new Date(fromDate)} }
+                                                            ]},
+                                                      { $project: projection } ])*/
+            }
+
+            cursor.forEach(addWeather, sendWeather)
+        })
+    }
+
     // Asumes that it is unique location
     // TO DO: fix it
     const addLocation = (name, country) => {
@@ -123,6 +157,7 @@ const dbWorker =  async (db) => {
         getLocationsByCity,
         getAllLocations,
         getWeatherData,
+        getWeatherDataFromDateId,
         addLocation,
         disconnect
     })

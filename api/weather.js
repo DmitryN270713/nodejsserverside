@@ -31,6 +31,12 @@ const weatherApi = (app, weatherDB) => {
         dbWorker.getAllLocations(req.params.toskip, req.params.perreq).then(locations => {
             res.status(status.OK).json(locations)
         }).catch(next)
+    })    
+    
+    app.get('/dateweather/:id/:fromDate/:toDate?', (req, res, next) => {
+        dbWorker.getWeatherDataFromDateId(req.params.id, req.params.fromDate, req.params.toDate).then(weather => {
+            res.status(status.OK).json(weather)
+        }).catch(next)
     })
 
     app.get('/locationweather/:id', (req, res, next) => {
