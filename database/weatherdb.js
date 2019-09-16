@@ -116,13 +116,14 @@ const dbWorker =  async (db) => {
             let cursor = null
             console.log(fromDate + " " + toDate)
             if (!toDate) {
-                cursor = collection.aggregate([{ $unwind: "$weather" }, { $match: { date: {$gte: new Date(fromDate)} } }, { $project: projection}])
+                cursor = collection.aggregate([{ $unwind: "$weather" }, { $match: { "weather.date": {$gte: new Date(fromDate)} } }, { $project: projection}])
             } else {
-               /* cursor = collection.aggregate([ { $unwind: "$weather" }, 
-                                                      {$and: [{ date: {$gte: new Date(fromDate)} },
-                                                              { date: {$lte: new Date(fromDate)} }
-                                                            ]},
-                                                      { $project: projection } ])*/
+                cursor = collection.aggregate([{ $unwind: "$weather" }, 
+                                               { $match: {
+                                                           "weather.date": {$gte: new Date(fromDate), $lte: new Date(toDate)}
+                                                         } 
+                                               },
+                                               { $project: projection } ])
             }
 
             cursor.forEach(addWeather, sendWeather)
