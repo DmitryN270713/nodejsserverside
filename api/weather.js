@@ -45,6 +45,16 @@ const weatherApi = (app, weatherDB) => {
         }).catch(next)
     })
 
+    app.post('/addweather', (req, res, next) => {
+        dbWorker.addWeatherToLocation(req.body.id, req.body.weatherData).then(weatherData => {
+            res.status(status.OK).json(weatherData)
+        }).catch(err =>  {
+            console.error(`Monkeys are broken ${err}`)
+            res.status(status.IM_A_TEAPOT).send({ error : err.message })
+            next()
+        })
+    })
+
     app.post('/addlocation', (req, res, next) => {
         dbWorker.addLocation(req.body.city, req.body.country).then(newLocation => {
             res.status(status.OK).json(newLocation)

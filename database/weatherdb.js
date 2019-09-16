@@ -130,8 +130,30 @@ const dbWorker =  async (db) => {
         })
     }
 
-    // Asumes that it is unique location
-    // TO DO: fix it
+    const addWeatherToLocation = (id, weatherData) => {
+        return new Promise((resolve, reject) => {
+            const sendUpdateWeatherData = (err, weatherData) => {
+                if (err) {
+                    return reject(new Error(`An error occured adding weather to location ${err}`))
+                }
+
+                resolve(weatherData)
+            }
+        
+            collection.updateOne(
+                    {id: id},
+                    {
+                        $addToSet: {
+                            weather: {
+                                $each: weatherData
+                            }
+                        }
+                    },
+                    sendUpdateWeatherData
+                )
+        })
+    }
+    
     const addLocation = (name, country) => {
         return new Promise((resolve, reject) => {
             const sendInsertLocation = (err, newLocation) => {
@@ -159,6 +181,7 @@ const dbWorker =  async (db) => {
         getAllLocations,
         getWeatherData,
         getWeatherDataFromDateId,
+        addWeatherToLocation,
         addLocation,
         disconnect
     })
