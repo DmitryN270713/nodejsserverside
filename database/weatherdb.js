@@ -169,6 +169,20 @@ const dbWorker =  async (db) => {
         })
     }
 
+    const removeLocation = (id) => {
+        return new Promise((resolve, reject) => {
+            const sendRemoved = (err, id) => {
+                if (err) {
+                    return reject(new Error(`Cannot remove specified location ${err}`))
+                }
+
+                resolve(id)
+            }
+
+            collection.deleteOne({id: id}, sendRemoved)
+        })
+    }
+
     // Disconnect from DB
     const disconnect = () => {
         db.close()
@@ -183,6 +197,7 @@ const dbWorker =  async (db) => {
         getWeatherDataFromDateId,
         addWeatherToLocation,
         addLocation,
+        removeLocation,
         disconnect
     })
 }
