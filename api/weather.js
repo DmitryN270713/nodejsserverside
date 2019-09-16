@@ -74,6 +74,16 @@ const weatherApi = (app, weatherDB) => {
             next()
         })
     })
+
+    app.delete('/removeweatherrecords', (req, res, next) => {
+        dbWorker.removeWeatherRecordByDate(req.body.id, req.body.fromDate, req.body.toDate).then(removedWeather => {
+            res.status(status.OK).json(removedWeather)
+        }).catch(err => {
+            console.error(`Monkeys are too tired to remove weather ${err}`)
+            res.status(status.IM_A_TEAPOT).send({ error : err.message })
+            next()
+        })
+    })
 }
 
 module.exports = Object.assign({}, {weatherApi})

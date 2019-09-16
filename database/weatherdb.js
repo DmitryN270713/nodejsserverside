@@ -139,6 +139,10 @@ const dbWorker =  async (db) => {
 
                 resolve(weatherData)
             }
+
+            weatherData.forEach((_, index, weatherData) => {
+                weatherData[index].date = new Date(weatherData[index].date)
+            })
         
             collection.updateOne(
                     {id: id},
@@ -183,6 +187,27 @@ const dbWorker =  async (db) => {
         })
     }
 
+    const removeWeatherRecordByDate = (id, fromDate, toDate) => {
+        return new Promise((resolve, reject) => {
+            const sendRemoved = (err, weatherRecord) => {                
+                if (err) {
+                    return reject(new Error(`Cannot remove specified location ${err}`))
+                }
+
+                resolve(weatherRecord)
+            }
+            
+            collection.updateOne(
+                {id: id},
+                {
+                    $pull: { "weather": { $elemMatch: { "date": { $gte: new Date(fromDate), $lte: new Date(toDate) } } } },
+                },
+                {multi: true},
+                sendRemoved
+            )
+        })
+    }
+
     // Disconnect from DB
     const disconnect = () => {
         db.close()
@@ -198,6 +223,7 @@ const dbWorker =  async (db) => {
         addWeatherToLocation,
         addLocation,
         removeLocation,
+        removeWeatherRecordByDate,
         disconnect
     })
 }
