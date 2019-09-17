@@ -19,7 +19,7 @@ const databaseSettings = {
         poolSize: 7,
         keepAlive: 300,
         connectTimeoutMS: 30000,
-        socketTimeoutMS: 30000
+        socketTimeoutMS: 30000,
     }),
 
     replsetParams: (replicaSetName = 'weatherReplica') => ({
@@ -35,5 +35,10 @@ const databaseSettings = {
     })
 }
 
+const serverSettings = {
+    port: 3000,
+    ssl: require("./ssl"),
+    useSsl: true
+}
 
-module.exports = Object.assign({}, {databaseSettings})
+module.exports = Object.assign({}, {databaseSettings, serverSettings})
