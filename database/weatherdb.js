@@ -200,7 +200,7 @@ const dbWorker =  async (db) => {
             collection.updateOne(
                 {id: id},
                 {
-                    $pull: { "weather": { $elemMatch: { "date": { $gte: new Date(fromDate), $lte: new Date(toDate) } } } },
+                    $pull: { weather: { date: { $gte: new Date(fromDate), $lte: new Date(toDate) } } },
                 },
                 {multi: true},
                 sendRemoved
