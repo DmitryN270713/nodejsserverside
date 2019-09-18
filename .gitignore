@@ -4,3 +4,4 @@ server.crt
 notes.txt
 mime*
 semver*
+package-lock.json
