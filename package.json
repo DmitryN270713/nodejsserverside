@@ -2,7 +2,7 @@
   "name": "microservice-pictures",
   "version": "0.0.1",
   "description": "microservice to show pictures",
-  "main": "app.js",
+  "main": "index.js",
   "author": "DN",
   "license": "MIT",
   "dependencies": {

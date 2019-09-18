@@ -1,2 +1,4 @@
 node_modules/
 privateKey.key
+server.crt
+notes.txt

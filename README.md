@@ -1,6 +1,6 @@
 # Weather microservice
 
-This service is open for use and modification under BSD license
+This service is open for use and modification under MIT license
 Code provided "as it is".
 
 ## Important
