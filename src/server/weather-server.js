@@ -7,6 +7,7 @@ const methodOverride = require('method-override')
 const morgan = require('morgan')
 const helmet = require('helmet')
 const https = require('https')
+const pem = require('pem')
 
 const errorHandler = require('../api/errorhandler')
 const api = require('../api/weather')
@@ -39,9 +40,15 @@ const startServer = (options, dbWorker) => {
         api.weatherApi(app, dbWorker)
 
         let server
-        if (options.useSsl) {
-            server = https.createServer(options.ssl, app)
-            server.listen(options.port, () => resolve(server))
+        if (options.ssl().useSsl) {
+            pem.createCertificate({ days: options.ssl().validDays, selfSigned: true }, (err, keys) => {
+                if (err) {
+                    return reject(new Error(`Our monkeys cannot do any better ${err}`))
+                }
+
+                server = https.createServer({ key: keys.serviceKey, cert: keys.certificate }, app)
+                server.listen(options.port, () => resolve(server))
+            })
         } else {
             server = app.listen(options.port, () => resolve(server))
         }

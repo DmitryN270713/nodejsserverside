@@ -37,8 +37,10 @@ const databaseSettings = {
 
 const serverSettings = {
     port: 3000,
-    ssl: require("./ssl"),
-    useSsl: true
+    ssl: ()=> ({        
+        useSsl: true,
+        validDays: 1
+    })
 }
 
 module.exports = Object.assign({}, {databaseSettings, serverSettings})
