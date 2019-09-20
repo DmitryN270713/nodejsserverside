@@ -14,7 +14,15 @@ Swagger was used to generate documentation.
 
 ## How to deploy microservice  
 
-`npm install`
+`npm install`  
+
+## How to run microservice  
+
+1. Make sure you have MongoDB installed
+2. Make sure it has collection named `weathercollection`
+3. To run microservice use this command `npm start`  
+  
+Current version of the microservice assumes that there is no authorization required on MongoDB side
 
 ## Known vulnerabilities  
   
