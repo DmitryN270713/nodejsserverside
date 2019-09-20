@@ -9,9 +9,13 @@ Documentation can be found [here]( https://htmlpreview.github.io/?https://github
 Swagger was used to generate documentation.  
 
 ## Build status  
-
+  
 [![Build Status](https://travis-ci.org/DmitryN270713/nodejsserverside.svg?branch=master)](https://travis-ci.org/DmitryN270713/nodejsserverside)
 
 ## How to deploy microservice  
 
 `npm install`
+
+## Known vulnerabilities  
+  
+[![Known Vulnerabilities](https://snyk.io//test/github/DmitryN270713/nodejsserverside/badge.svg?targetFile=package.json)](https://snyk.io//test/github/DmitryN270713/nodejsserverside?targetFile=package.json)
