@@ -5,5 +5,5 @@ Code provided "as it is".
 
 ## Microservice documentation
 
-Documentation can be found [here]( https://htmlpreview.github.io/?https://github.com/DmitryN270713/nodejsserverside/blob/master/docs/index.html)
+Documentation can be found [here]( https://htmlpreview.github.io/?https://github.com/DmitryN270713/nodejsserverside/blob/master/docs/index.html)  
 Swagger was used to generate documentation.
