@@ -1,0 +1,596 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a simple weather microservice that will be used to gather information for following up analysis.",
+    "version": "0.0.1",
+    "title": "Weather microservice",
+    "termsOfService": "Deployed under MIT license",
+    "contact": {
+      "email": "willbe@skipped.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://en.wikipedia.org/wiki/MIT_License"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "about",
+      "description": "Information about this microservice"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/weather/addweather": {
+      "post": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Add a new new weather records",
+        "description": "Add a new new weather records",
+        "operationId": "addweather",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Weather records",
+            "description": "Weather records object",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Weather_Records"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Information either was added or skipped, see returned json file"
+          }
+        }
+      }
+    },
+    "/weather/locationweather": {
+      "get": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Finds weather records by location's id",
+        "description": "Returns all records for current location",
+        "operationId": "locationweather",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "id of the location (generated sha1)",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns either object or null",
+            "schema": {
+              "type": "object",
+              "items": {
+                "$ref": "#/definitions/Location_Weather_Data"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/weather/dateweather": {
+      "get": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Returns weather data for date specified",
+        "description": "Returns weather data for specified location's id, date to start from and as an optional parameter date to stop at. If second date parameter is not provided, request will return weather records starting from the first date till the latest record in data base",
+        "operationId": "dateweather",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "id used to find location",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fromDate",
+            "in": "query",
+            "description": "date to search from",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "toDate",
+            "in": "query",
+            "description": "date to restrict returned data with",
+            "type": "string",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Location_Weather_Data"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/weather/removeweatherrecords": {
+      "delete": {
+        "tags": [
+          "weather"
+        ],
+        "summary": "Remove weather record(s)",
+        "description": "Removes one or more weather records for location specified with id, date to start from, and date to end with",
+        "operationId": "removeweatherrecords",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Parameters to remove with",
+            "description": "Object that specifies parameters to make query with",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Weather_Record_To_Remove"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Generic_Response"
+            }
+          }
+        }
+      }
+    },
+    "/locations/addlocation": {
+      "post": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Adds location",
+        "description": "Adds location to the database, if does not exist",
+        "operationId": "addlocation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Parameters to remove with",
+            "description": "Object that specifies parameters to make query with",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Location_Record"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Location was added"
+          },
+          "418": {
+            "description": "Location exists"
+          }
+        }
+      }
+    },
+    "/locations/alllocations": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Returns specified number of locations",
+        "description": "Returns the number of locations specified starting from toskip adding automatically perreq number of locations",
+        "operationId": "alllocations",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "toskip",
+            "in": "query",
+            "description": "position to start with",
+            "type": "integer",
+            "required": true
+          },
+          {
+            "name": "perreq",
+            "in": "query",
+            "description": "delta to add to skipto variable",
+            "type": "integer",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation with array of data. If provided indecies are out of scope, array will be empty",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Location_Records_ID"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations/location": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Gets location by country and city names",
+        "description": "Gets location by country and city names",
+        "operationId": "location",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the city",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Name of the country",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation with object or null returned",
+            "schema": {
+              "$ref": "#/definitions/Location_Record_ID"
+            }
+          }
+        }
+      }
+    },
+    "/locations/country": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Returns location(s) for the country specified",
+        "description": "Returns location(s) for the country specified",
+        "operationId": "country",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the country",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation with array returned",
+            "schema": {
+              "$ref": "#/definitions/Location_Records_ID"
+            }
+          }
+        }
+      }
+    },
+    "/locations/city": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Returns location(s) for the city specified",
+        "description": "Returns location(s) for the city specified",
+        "operationId": "city",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of the city",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation with array returned",
+            "schema": {
+              "$ref": "#/definitions/Location_Records_ID"
+            }
+          }
+        }
+      }
+    },
+    "/locations/removelocation": {
+      "delete": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Removes selected location",
+        "description": "Removes selected location with specified id from database",
+        "operationId": "removelocation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "body",
+            "description": "ID of the order that needs to be deleted",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Location_ID"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/Generic_Response"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Weather_Record": {
+      "type": "object",
+      "required": [
+        "date",
+        "pressure",
+        "temperature",
+        "humidity"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "example": "2018-11-01 14:07:09.777"
+        },
+        "pressure": {
+          "type": "number",
+          "example": "1.1"
+        },
+        "temperature": {
+          "type": "number",
+          "example": "21.10"
+        },
+        "humidity": {
+          "type": "number",
+          "example": "99.47"
+        }
+      }
+    },
+    "Location_Weather_Data": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "New York"
+        },
+        "country": {
+          "type": "string",
+          "example": "USA"
+        },
+        "weather": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Weather_Record"
+          }
+        }
+      }
+    },
+    "Weather_Records": {
+      "type": "object",
+      "required": [
+        "id",
+        "weatherData"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "97a999e7a2c37aa099177ac45a4de788da335a28"
+        },
+        "weatherData": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Weather_Record"
+          }
+        }
+      }
+    },
+    "Result_Object": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "nModified": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "ok": {
+          "type": "integer",
+          "format": "uint64"
+        }
+      }
+    },
+    "Connection_Object": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "host": {
+          "type": "string",
+          "example": "localhost"
+        },
+        "port": {
+          "type": "integer",
+          "format": "uint16"
+        }
+      }
+    },
+    "Generic_Response": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "$ref": "#/definitions/Result_Object"
+        },
+        "connection": {
+          "$ref": "#/definitions/Connection_Object"
+        },
+        "modifiedCount": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "upsertedId": {
+          "type": "string",
+          "example": "5d7fd1acc1d53d1ffc7c92c7"
+        },
+        "upsertedCount": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "matchedCount": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "n": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "nModified": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "ok": {
+          "type": "integer",
+          "format": "uint64"
+        }
+      }
+    },
+    "Weather_Record_To_Remove": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "97a999e7a2c37aa099177ac45a4de788da335a28"
+        },
+        "fromDate": {
+          "type": "string",
+          "example": "2015-11-01 00:00:00"
+        },
+        "toDate": {
+          "type": "string",
+          "example": "2019-11-01 23:59:59"
+        }
+      },
+      "required": [
+        "id",
+        "fromDate",
+        "toDate"
+      ]
+    },
+    "Location_Record": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "example": "Oulu"
+        },
+        "country": {
+          "type": "string",
+          "example": "Finland"
+        }
+      }
+    },
+    "Location_Record_ID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "97a999e7a2c37aa099177ac45a4de788da335a28"
+        },
+        "city": {
+          "type": "string",
+          "example": "Oulu"
+        },
+        "country": {
+          "type": "string",
+          "example": "Finland"
+        }
+      }
+    },
+    "Location_Records_ID": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Location_Record_ID"
+      }
+    },
+    "Location_ID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "97a999e7a2c37aa099177ac45a4de788da335a28"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

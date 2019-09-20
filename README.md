@@ -3,5 +3,6 @@
 This service is open for use and modification under MIT license
 Code provided "as it is".
 
-## Important
-Do not forget to generate own private key to use https. Private key is not provided. For more information see `./config/ssl/README.md`
+## Microservice documentation
+
+Documentation can be found [here]( https://htmlpreview.github.io/?https://github.com/DmitryN270713/nodejsserverside/blob/master/docs/index.html)
