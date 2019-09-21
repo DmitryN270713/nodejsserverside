@@ -29,5 +29,8 @@
     "mongodb",
     "microservice",
     "nodejs"
-  ]
+  ],
+  "devDependencies": {
+    "mocha": "^6.2.0"
+  }
 }
