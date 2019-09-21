@@ -27,6 +27,22 @@ describe('Locations\' Weather API', () => {
             {"date": "2010-12-01 09:07:09.777", "pressure": 5, "temperature": 27, "humidity": 99 }
     ]}]
 
+    let testAllLocations = []
+    let newLocation = {
+            "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
+            "name": "San Francisco",
+            "country": "USA",
+            "weather": [
+                {
+                    "date": "2019-09-21T16:10:34.805Z",
+                    "pressure": 0,
+                    "temperature": 0,
+                    "humidity": 0
+                }
+            ],
+            "_id": "5d864b7afc567b1fa47659e4"
+        }
+
     let testDBWorker = {
         getAllLocations (toskip, perreq) {
             let locations = []
@@ -39,6 +55,18 @@ describe('Locations\' Weather API', () => {
                 locations.push(item)
             }
             return Promise.resolve(locations)
+        },
+
+        addLocation (name, country) {
+            for (item in testAllLocations) {
+                if (item.id === sha1(name + country))
+                // TO DO: Add implementation here
+                    return Promise.reject()
+            }
+            
+            testAllLocations.push(newLocation)
+
+            return Promise.resolve(newLocation)
         }
     }
 
@@ -94,6 +122,14 @@ describe('Locations\' Weather API', () => {
                 "country": "Finland"
             })
         })
+        .expect(200, done)
+    })
+
+    it('Should add one location', (done) => {
+        request(app)
+        .post('/locations/addlocation')
+        .set("Content-Type", "application/json")
+        .send({"city":"San Francisco","country":"USA"})
         .expect(200, done)
     })
 })
