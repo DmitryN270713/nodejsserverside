@@ -10,7 +10,7 @@ describe('Locations\' Weather API', () => {
         "id": "97a999e7a2c37aa099177ac45a4de788da335a28",
         "name": "Washington",
         "country": "USA",
-        "weatherData" : [
+        "weather" : [
             {"date": "2018-11-01 14:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
             {"date": "2017-12-01 11:07:09.777", "pressure": 4, "temperature": 27, "humidity": 99 },
             {"date": "2015-11-01 10:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
@@ -22,7 +22,7 @@ describe('Locations\' Weather API', () => {
         "id": "a96e5a1a4965ac93673625c1eec0262503824e5b",
         "name": "Oulu",
         "country": "Finland",
-        "weatherData" : [
+        "weather" : [
             {"date": "2018-11-01 14:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
             {"date": "2017-12-01 11:07:09.777", "pressure": 7, "temperature": -27, "humidity": 99 },
             {"date": "2015-11-01 10:07:09.777", "pressure": 4, "temperature": 5, "humidity": 100 },
@@ -140,8 +140,28 @@ describe('Locations\' Weather API', () => {
                 return (element.id === id)
             })
 
-            return Promise.resolve([{name: result.name, country: result.country, weather: result.weather}])
+            return Promise.resolve({name: result.name, country: result.country, weather: result.weather})
+        },
+
+        getWeatherDataFromDateId (id, fromDate, toDate) {
+            let weatherRecs = []
+            var result = testLocationsWithRecords.find((element) => {
+                return (element.id === id)
+            })
+
+            if (!toDate) {
+                weatherRecs = result.weather.find((element) => {
+                    return (new Date(element.date) >= new Date(fromDate))
+                })
+            } else {
+                weatherRecs = result.weather.find((element) => {
+                    return (new Date(element.date) >= new Date(fromDate) && new Date(element.date) <= new Date(toDate))
+                })
+            }
+
+            return Promise.resolve({name: result.name, country: result.country, weather: weatherRecs})
         }
+
     }
 
     let testServerOptions = {
@@ -272,14 +292,40 @@ describe('Locations\' Weather API', () => {
         .expect(200, done)
     })
 
-    it('Should return 1 location by city name', (done) => {
+    it('Should return 1 location weather by location id', (done) => {
         request(app)
         .get('/weather/locationweather/a96e5a1a4965ac93673625c1eec0262503824e5b')
         .expect((res) => {
-            res.body[0].should.containEql({
+            res.body.should.containEql({
                 "name": "Oulu",
                 "country": "Finland"
             })
+        })
+        .expect(200, done)
+    })
+
+    it('Should return 1 location weather by location id starting from date 2017-12-07 14:07:09.777', (done) => {
+        request(app)
+        .get('/weather/dateweather/a96e5a1a4965ac93673625c1eec0262503824e5b/2017-12-07 14:07:09.777')
+        .expect((res) => {
+            res.body.should.containEql({
+                "name": "Oulu",
+                "country": "Finland"
+            })
+            res.body.weather.should.have.property('date', '2018-11-01 14:07:09.777')
+        })
+        .expect(200, done)
+    })
+
+    it('Should return 1 location weather by location id starting from date 2015-10-01 10:07:09.777 up till 2015-12-01 11:07:09.777', (done) => {
+        request(app)
+        .get('/weather/dateweather/a96e5a1a4965ac93673625c1eec0262503824e5b/2015-10-01 10:07:09.777/2015-12-01 11:07:09.777')
+        .expect((res) => {
+            res.body.should.containEql({
+                "name": "Oulu",
+                "country": "Finland"
+            })
+            res.body.weather.should.have.property('date', '2015-11-01 10:07:09.777')
         })
         .expect(200, done)
     })
