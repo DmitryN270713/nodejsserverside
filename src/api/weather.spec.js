@@ -133,6 +133,14 @@ describe('Locations\' Weather API', () => {
             })
 
             return Promise.resolve([{id: result.id, name: result.name, country: result.country}])
+        },
+
+        getWeatherData(id) {
+            var result = testLocationsWithRecords.find((element) => {
+                return (element.id === id)
+            })
+
+            return Promise.resolve([{name: result.name, country: result.country, weather: result.weather}])
         }
     }
 
@@ -257,6 +265,18 @@ describe('Locations\' Weather API', () => {
         .expect((res) => {
             res.body[0].should.containEql({
                 "id": "a96e5a1a4965ac93673625c1eec0262503824e5b",
+                "name": "Oulu",
+                "country": "Finland"
+            })
+        })
+        .expect(200, done)
+    })
+
+    it('Should return 1 location by city name', (done) => {
+        request(app)
+        .get('/weather/locationweather/a96e5a1a4965ac93673625c1eec0262503824e5b')
+        .expect((res) => {
+            res.body[0].should.containEql({
                 "name": "Oulu",
                 "country": "Finland"
             })
