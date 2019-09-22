@@ -45,7 +45,23 @@ describe('Locations\' Weather API', () => {
 
     }]
 
-    let newLocation = {
+    let testLocationsRemove = [{
+        "id": "97a999e7a2c37aa099177ac45a4de788da335a28",
+        "name": "Washington",
+        "country": "USA",
+        "weather": [
+            {
+                "date": "2019-09-21T16:10:34.805Z",
+                "pressure": 0,
+                "temperature": 0,
+                "humidity": 0
+            }
+        ],
+        "_id": "5d7d1de69bd4220aa019a4ed"
+
+    }]
+
+    const newLocation = {
             "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
             "name": "San Francisco",
             "country": "USA",
@@ -85,6 +101,38 @@ describe('Locations\' Weather API', () => {
             } else {
                 return Promise.reject(new Error('An error occured adding new location'))
             }
+        },
+
+        removeLocation (id) {
+            let filtered = testLocationsRemove.filter((item) => {
+                return item.id === id            
+            })
+
+            return Promise.resolve(filtered)
+        },
+
+        getLocationByCountryCity (name, country) {
+            var result = testLocationsWithRecords.find((element) => {
+                return (element.name === name && element.country === country)
+            })
+
+            return Promise.resolve({id: result.id, name: result.name, country: result.country})
+        },        
+
+        getLocationsByCountry (country) {
+            var result = testLocationsWithRecords.find((element) => {
+                return (element.country === country)
+            })
+
+            return Promise.resolve([{id: result.id, name: result.name, country: result.country}])
+        },        
+
+        getLocationsByCity (city) {
+            var result = testLocationsWithRecords.find((element) => {
+                return (element.name === city)
+            })
+
+            return Promise.resolve([{id: result.id, name: result.name, country: result.country}])
         }
     }
 
@@ -167,5 +215,52 @@ describe('Locations\' Weather API', () => {
             res.body.should.have.property('error', 'An error occured adding new location')
             done()
         })
+    })
+
+    it('Should remove one location by id', (done) => {
+        request(app)
+        .delete('/locations/removelocation')
+        .set("Content-Type", "application/json")
+        .send({"id":"97a999e7a2c37aa099177ac45a4de788da335a28"})      
+        .expect(200, done)
+    })
+
+    it('Should return 1 location by the names of the city and country', (done) => {
+        request(app)
+        .get('/locations/location/Washington/USA')
+        .expect((res) => {
+            res.body.should.containEql({
+                "id": "97a999e7a2c37aa099177ac45a4de788da335a28",
+                "name": "Washington",
+                "country": "USA"
+            })
+        })
+        .expect(200, done)
+    })
+
+    it('Should return 1 location by country name', (done) => {
+        request(app)
+        .get('/locations/country/Finland')
+        .expect((res) => {
+            res.body[0].should.containEql({
+                "id": "a96e5a1a4965ac93673625c1eec0262503824e5b",
+                "name": "Oulu",
+                "country": "Finland"
+            })
+        })
+        .expect(200, done)
+    })
+
+    it('Should return 1 location by city name', (done) => {
+        request(app)
+        .get('/locations/city/Oulu')
+        .expect((res) => {
+            res.body[0].should.containEql({
+                "id": "a96e5a1a4965ac93673625c1eec0262503824e5b",
+                "name": "Oulu",
+                "country": "Finland"
+            })
+        })
+        .expect(200, done)
     })
 })
