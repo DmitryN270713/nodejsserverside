@@ -1,6 +1,8 @@
 const server = require('../server/weather-server')
 const request = require('supertest')
 const should = require('should')
+const sha1 = require('sha1')
+const expect = require('expect')
 
 describe('Locations\' Weather API', () => {
     let app = null
@@ -27,7 +29,22 @@ describe('Locations\' Weather API', () => {
             {"date": "2010-12-01 09:07:09.777", "pressure": 5, "temperature": 27, "humidity": 99 }
     ]}]
 
-    let testAllLocations = []
+    let testAllLocations = [{
+        "id": "dd39228e281641635b87b4980cf2d3faedc5d366",
+        "name": "New-York",
+        "country": "USA",
+        "weather": [
+            {
+                "date": "2019-09-21T16:10:34.805Z",
+                "pressure": 0,
+                "temperature": 0,
+                "humidity": 0
+            }
+        ],
+        "_id": "5d7d1de69bd4220aa019a4ed"
+
+    }]
+
     let newLocation = {
             "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
             "name": "San Francisco",
@@ -58,15 +75,16 @@ describe('Locations\' Weather API', () => {
         },
 
         addLocation (name, country) {
-            for (item in testAllLocations) {
-                if (item.id === sha1(name + country))
-                // TO DO: Add implementation here
-                    return Promise.reject()
-            }
+            var result = testAllLocations.find((element) => {
+                return element.id === sha1(name + country)
+            })
             
-            testAllLocations.push(newLocation)
-
-            return Promise.resolve(newLocation)
+            if(!result) {
+                testAllLocations.push(newLocation)
+                return Promise.resolve(newLocation)
+            } else {
+                return Promise.reject(new Error('An error occured adding new location'))
+            }
         }
     }
 
@@ -129,7 +147,25 @@ describe('Locations\' Weather API', () => {
         request(app)
         .post('/locations/addlocation')
         .set("Content-Type", "application/json")
-        .send({"city":"San Francisco","country":"USA"})
-        .expect(200, done)
+        .send({"city":"San Francisco","country":"USA"})      
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+            res.body.should.have.property('id', 'cc67b756e13580d088bb6122a6bb6490cc8a543f')
+            done()
+        })
+    })
+
+    it('Should fail to add one location', (done) => {
+        request(app)
+        .post('/locations/addlocation')
+        .set("Content-Type", "application/json")
+        .send({"city":"New-York","country":"USA"})      
+        .expect(418)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+            res.body.should.have.property('error', 'An error occured adding new location')
+            done()
+        })
     })
 })
