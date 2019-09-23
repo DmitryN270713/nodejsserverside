@@ -231,7 +231,7 @@ const dbWorker =  async (db) => {
 const establishConnection = (connection) => {
     return new Promise((resolve, reject) => {
         if (!connection) {
-            return reject(new Error("connection object was not provided"))
+            return reject(new Error("Connection object was not provided"))
         }
 
         resolve(dbWorker(connection))
