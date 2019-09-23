@@ -167,10 +167,29 @@ describe('Locations\' Weather API', () => {
             const expectedID = "cc67b756e13580d088bb6122a6bb6490cc8a543f"
             const expectedDataLength = 6
 
-            if (id !== expectedID, weatherData.length !== expectedDataLength)
+            if (id !== expectedID || weatherData.length !== expectedDataLength)
                 return Promise.reject(new Error("Monkeys swallowed some data"))
 
             return Promise.resolve(weatherData)
+        },
+
+        removeWeatherRecordByDate (id, fromDate, toDate) {
+            const expectedID = "cc67b756e13580d088bb6122a6bb6490cc8a543f"
+            const expectedFromDate = new Date("2018-5-01 14:07:09.777")
+            const expectedToDate = new Date("2019-5-01 14:07:09.777")
+            const actualFromDate = new Date(fromDate)
+            let actualToDate
+            if (toDate) {
+                actualToDate = new Date(toDate)
+
+                if (actualToDate.getDate() !== expectedToDate.getDate())
+                    return Promise.reject(new Error("Monkeys swallowed toDate date"))
+            }
+
+            if (id !== expectedID || actualFromDate.getDate() !== expectedFromDate.getDate())
+                return Promise.reject(new Error("Monkeys swallowed some data"))
+
+            return Promise.resolve(id)
         }
 
     }
@@ -385,5 +404,28 @@ describe('Locations\' Weather API', () => {
             res.body.should.have.property('error', 'Monkeys swallowed some data')
             done()
         })
+    })
+
+    it('Should remove weather records from 2018-5-01 14:07:09.777 to 2019-5-01 14:07:09.777 by id', (done) => {
+        request(app)
+        .delete('/weather/removeweatherrecords')
+        .set("Content-Type", "application/json")
+        .send({
+                "id":"cc67b756e13580d088bb6122a6bb6490cc8a543f",
+                "fromDate": "2018-5-01 14:07:09.777",
+                "toDate": "2019-5-01 14:07:09.777"
+             })      
+        .expect(200, done)
+    })
+
+    it('Should remove weather records from 2018-5-01 14:07:09.777 to present by id', (done) => {
+        request(app)
+        .delete('/weather/removeweatherrecords')
+        .set("Content-Type", "application/json")
+        .send({
+                "id":"cc67b756e13580d088bb6122a6bb6490cc8a543f",
+                "fromDate": "2018-5-01 14:07:09.777"
+             })      
+        .expect(200, done)
     })
 })
