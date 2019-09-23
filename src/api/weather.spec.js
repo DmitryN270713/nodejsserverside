@@ -61,20 +61,20 @@ describe('Locations\' Weather API', () => {
 
     }]
 
-    const newLocation = {
-            "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
-            "name": "San Francisco",
-            "country": "USA",
-            "weather": [
-                {
-                    "date": "2019-09-21T16:10:34.805Z",
-                    "pressure": 0,
-                    "temperature": 0,
-                    "humidity": 0
-                }
-            ],
-            "_id": "5d864b7afc567b1fa47659e4"
-        }
+    const testNewLocation = {
+        "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
+        "name": "San Francisco",
+        "country": "USA",
+        "weather": [
+            {
+                "date": "2019-09-21T16:10:34.805Z",
+                "pressure": 0,
+                "temperature": 0,
+                "humidity": 0
+            }
+        ],
+        "_id": "5d864b7afc567b1fa47659e4"
+    }
 
     let testDBWorker = {
         getAllLocations (toskip, perreq) {
@@ -96,8 +96,8 @@ describe('Locations\' Weather API', () => {
             })
             
             if(!result) {
-                testAllLocations.push(newLocation)
-                return Promise.resolve(newLocation)
+                testAllLocations.push(testNewLocation)
+                return Promise.resolve(testNewLocation)
             } else {
                 return Promise.reject(new Error('An error occured adding new location'))
             }
@@ -160,6 +160,17 @@ describe('Locations\' Weather API', () => {
             }
 
             return Promise.resolve({name: result.name, country: result.country, weather: weatherRecs})
+        },
+
+        addWeatherToLocation (id, weatherData) {
+
+            const expectedID = "cc67b756e13580d088bb6122a6bb6490cc8a543f"
+            const expectedDataLength = 6
+
+            if (id !== expectedID, weatherData.length !== expectedDataLength)
+                return Promise.reject(new Error("Monkeys swallowed some data"))
+
+            return Promise.resolve(weatherData)
         }
 
     }
@@ -328,5 +339,51 @@ describe('Locations\' Weather API', () => {
             res.body.weather.should.have.property('date', '2015-11-01 10:07:09.777')
         })
         .expect(200, done)
+    })
+
+    it('Should add six records', (done) => {
+        request(app)
+        .post('/weather/addweather')
+        .set("Content-Type", "application/json")
+        .send({
+                "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
+                "weatherData" : [
+                    {"date": "2018-5-01 14:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
+                    {"date": "2017-6-01 11:07:09.777", "pressure": 4, "temperature": 27, "humidity": 99 },
+                    {"date": "2015-7-01 10:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
+                    {"date": "2010-8-01 09:07:09.777", "pressure": 4, "temperature": 27, "humidity": 99 },
+                    {"date": "2011-7-21 04:07:09.777", "pressure": 5, "temperature": 21, "humidity": 90 },
+                    {"date": "2014-5-15 07:07:09.777", "pressure": 7, "temperature": 26, "humidity": 97 }
+        ]})
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+            if (err) {
+                done(err)
+            } else {
+                done()
+            }
+        })
+    })
+
+    it('Should fail to add records', (done) => {
+        request(app)
+        .post('/weather/addweather')
+        .set("Content-Type", "application/json")
+        .send({
+                "id": "cc67b756e13580d088bb6122a6bb6490cc8a543f",
+                "weatherData" : [
+                    {"date": "2018-5-01 14:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
+                    {"date": "2017-6-01 11:07:09.777", "pressure": 4, "temperature": 27, "humidity": 99 },
+                    {"date": "2015-7-01 10:07:09.777", "pressure": 3, "temperature": 25, "humidity": 100 },
+                    {"date": "2010-8-01 09:07:09.777", "pressure": 4, "temperature": 27, "humidity": 99 },
+                    {"date": "2011-7-21 04:07:09.777", "pressure": 5, "temperature": 21, "humidity": 90 }
+        ]})
+        .expect(418)
+        .expect('Content-Type', /json/)
+        .end((err, res) => {
+            res.body.should.have.property('error', 'Monkeys swallowed some data')
+            done()
+        })
     })
 })
