@@ -17,6 +17,10 @@ Swagger was used to generate documentation.
 ## How to deploy microservice  
 
 `npm install`  
+  
+## How to run tests
+
+`npm test`
 
 ## How to run microservice  
 
