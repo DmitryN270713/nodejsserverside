@@ -4,3 +4,14 @@ node_js:
   - '12'
 cache:
   npm: false
+
+stages:
+  - lint
+  - test
+
+jobs:
+  include:
+    - stage: lint
+    script: npm start lint
+    - stage: test
+    script: npm start test
